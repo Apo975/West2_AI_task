@@ -1,0 +1,436 @@
+<!DOCTYPE html><!--<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">--><html class="logout-html">
+
+<head>
+    <base href="./"><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><!-- <base th:href="${@environment.getProperty('server.context-path')}"> --><!--<title th:text="#{screen.logout.header}">CAS Logout</title>--><title>统一身份认证平台</title>
+    <link href="css/cas.css" rel="stylesheet" /><script src="js/dingtalk.min.js"></script>
+    <script src="js/jquery1.12.4.js"></script>
+</head>
+
+<body class="logout-body" id="logout-body-bg" style="background-size: cover;background-repeat: no-repeat;">
+    <div style="display: none">
+        <p id="canot-access-url"></p>
+        <p id="canot-access-code">1510051</p>
+        <p id="not-exist-deal-style"></p>
+        <p id="not-exist-tip"></p>
+        <p id="sid-not-exist-tip"></p>
+        <p id="sid-lock-tip"></p>
+        <p id="sid-expire-tip"></p>
+
+        <p id="allow-to-login-page"></p>
+        <p id="loginBackUrl"></p>
+
+    </div>
+    <header id="content-header" class="logout-header">
+        <img src="" id="logout-header-logo"></header>
+
+    <main role="main" class="container">
+        <div id="app-unauthorization-layout">
+
+            <div id="web-content">
+                <div class="service-error-content">
+                    <div>
+
+                        <img class="service-error-content-img" src="images/noDocking.png"></div>
+                    <div class="service-error">
+
+                        <div class="service-error-title"></div>
+                        <div class="service-error-text"></div>
+                        <div class="service-error-help"></div>
+                        <div class="service-error-help-twice"></div>
+                        <button class="service-error-button">
+                            <span class="service-error-button-text">
+
+                                <span class="service-error-button-text-box">
+                                    重新登录
+                                    <span class="service-error-countdown"></span>
+                                </span>
+
+                                <span class="service-error-button-text-other-login">
+                                    使用其他方式登录
+                                </span>
+
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="phone-content">
+                <div class="service-error-content-phone">
+                    <div>
+                        <img class="service-error-content-phone-img" src="images/noDockingPhone.png"></div>
+                    <div class="service-error-phone">
+                        <div class="service-error-phone-title"></div>
+                        <div class="service-error-phone-text">
+                        </div>
+                        <div class="service-error-phone-help"></div>
+                        <div class="service-error-phone-help-twice"></div>
+                    </div>
+
+                    <button class="service-error-phone-button">
+                        <span class="service-error-button-text">
+                            <span class="service-error-phone-button-text-box">
+                                重新登录
+                                <span class="service-error-phone-countdown"></span>
+                            </span>
+
+                            <span class="service-error-phone-button-text-other-login">
+                                使用其他方式登录
+                            </span>
+
+                        </span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="user-unauthorization-layout">
+            <div id="user-web-content">
+
+                <div class="service-error-content">
+                    <div>
+
+                        <img class="service-error-content-img" src="images/noDocking.png"></div>
+                    <div class="service-error">
+
+                        <div class="service-error-title"></div>
+                        <div class="service-error-text"></div>
+                        <div class="service-error-help"></div>
+                        <div class="service-error-help-twice"></div>
+                        <button class="service-error-button"><span class="service-error-button-text"><span>重新登录<span
+                                        class="service-error-countdown"></span></span></span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="user-phone-content">
+
+                <div class="service-error-content-phone">
+                    <div>
+                        <img class="service-error-content-phone-img" src="images/noDockingPhone.png"></div>
+                    <div class="service-error-phone">
+                        <div class="service-error-phone-title"></div>
+                        <div class="service-error-phone-text">
+                        </div>
+                        <div class="service-error-phone-help"></div>
+                        <div class="service-error-phone-help-twice"></div>
+
+                        <button class="service-error-phone-button"><span
+                                class="service-error-button-text"><span>重新登录<span
+                                        class="service-error-phone-countdown"></span></span></span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </main>
+    <p style="display: none" id="frontend-addr">https://sso.fzu.edu.cn</p>
+    <script>
+        //获取单域名前缀，同域下已经存在local中了
+        var frontend_base_url = localStorage.getItem('frontend_base_url') || '';
+        var frontend_base_cas_url = localStorage.getItem('frontend_base_cas_url') || '';
+        var url = document.getElementById('frontend-addr').innerText;
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = url + '/public/deploy/deploy.js?' + (new Date()).getTime();
+        script.onload = function () {
+            window.casPageInit('serviceerror');
+        };
+        script.onerror = function (e) {
+            console.log(e);
+        };
+        document.body.appendChild(script);
+    </script>
+    <script>
+
+        var userAgentInfo = navigator.userAgent;
+        var agents = ['Android', 'iPhone',
+            'SymbianOS', 'Windows Phone',
+            'iPad', 'iPod'
+        ];
+        var isPhone = false;
+        for (var v = 0; v < agents.length; v++) {
+            if (userAgentInfo.indexOf(agents[v]) !== -1) {
+                isPhone = true;
+                break;
+            }
+        }
+        //如果是手机那么就对其进行监听
+        if (isPhone) {
+            pushHistory();
+            window.addEventListener("popstate", function (e) {
+                dd.biz.navigation.close({
+                    onSuccess: function (result) {
+                        console.log('ddclose', result);
+                    },
+                    onFail: function (err) {
+                        console.log('ddclose', result);
+                    }
+                });
+            }, false);
+            function pushHistory() {
+                var state = {
+                    title: "tmp_dingtalk_back",
+                    url: "#"
+                };
+                window.history.pushState(state, "tmp_dingtalk_back", "#");
+            }
+        }
+
+
+        var canotAccessUrl = document.getElementById('canot-access-url').innerText === 'true';
+        if (canotAccessUrl) {
+            document.getElementById('user-unauthorization-layout').style.display = 'block';
+            document.getElementById('app-unauthorization-layout').style.display = 'none';
+        } else {
+            document.getElementById('user-unauthorization-layout').style.display = 'none';
+            document.getElementById('app-unauthorization-layout').style.display = 'block';
+        }
+        // 错误信息展示
+        var accessCode = document.getElementById('canot-access-code') && document.getElementById('canot-access-code')
+            .innerText;
+        switch (Number(accessCode)) {
+            default: {
+
+                // pc and mobile
+                document.getElementsByClassName('service-error-content' + (isPhone ? '-phone' : '') + '-img')[
+                    canotAccessUrl ? 1 : 0].src = 'images/loginBackIn' + (isPhone ? 'Phone' : '') + '.png';
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-title')[
+                    canotAccessUrl ?
+                        1 : 0].innerHTML = '请重新登录';
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-text')[canotAccessUrl ?
+                    1 : 0].innerHTML = '您本次登录请求存在异常，系统';
+
+                var countDown = 10;
+                var countDownTimer = setInterval(function () {
+                    countDown -= 1;
+                    document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-help')[
+                        canotAccessUrl ? 1 : 0].innerHTML = '将在' + countDown + '秒后自动跳转到登录页面';
+
+                    document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') +
+                        '-countdown')[
+                        canotAccessUrl ? 1 : 0].innerHTML = '（' + countDown + '）';
+
+                    if (countDown <= 0) {
+                        clearInterval(countDownTimer);
+                        document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') +
+                            '-countdown')[canotAccessUrl ? 1 : 0].innerHTML = '';
+
+                        window.location.href = window.location.origin + frontend_base_cas_url + '/login';
+                    }
+                }, 1000)
+
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-help')[canotAccessUrl ?
+                    1 : 0].innerHTML = '将在' + countDown + '秒后自动跳转到登录页面';
+
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-countdown')[
+                    canotAccessUrl ? 1 : 0].innerHTML = '（' + countDown + '）';
+
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-button')[
+                    canotAccessUrl ? 1 : 0].style.display = 'block';
+
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-button')[
+                    canotAccessUrl ? 1 : 0].addEventListener('click', function () {
+                        clearInterval(countDownTimer);
+                        window.location.href = window.location.origin + frontend_base_cas_url + '/login';
+                    })
+                break;
+            }
+            // 未对接认证服务
+            case 1510051: {
+
+                // pc and mobile
+
+                document.getElementsByClassName('service-error-content' + (isPhone ? '-phone' : '') + '-img')[
+                    canotAccessUrl ? 1 : 0].src = 'images/noDocking' + (isPhone ? 'Phone' : '') + '.png';
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-title')[
+                    canotAccessUrl ?
+                        1 : 0].innerHTML = '应用未对接认证服务';
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-text')[canotAccessUrl ?
+                    1 : 0].innerHTML = '您访问的应用尚未接入统一身份认证，';
+
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-help')[canotAccessUrl ?
+                    1 : 0].innerHTML = '请联系相关部门完成对接配置';
+
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-button')[
+                    canotAccessUrl ? 1 : 0].style.display = 'none';
+
+                break;
+            }
+            case 1510056: {
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-title')[
+                    canotAccessUrl ?
+                        1 : 0].innerHTML = '认证失败';
+                var texttip = document.getElementById('sid-lock-tip').innerText;
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-text')[
+                    canotAccessUrl ?
+                        1 : 0].innerHTML = texttip;
+                break;
+            }
+            case 1510057: {
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-title')[
+                    canotAccessUrl ?
+                        1 : 0].innerHTML = '认证失败';
+                var texttip = document.getElementById('sid-expire-tip').innerText;
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-text')[
+                    canotAccessUrl ?
+                        1 : 0].innerHTML = texttip;
+                break;
+            }
+            // 无法识别身份，app用户不存在
+            case 1510054:
+            // 无法识别身份，sid用户不存在
+            case 1510052: {
+                //如果等于2那么直接白屏幕 并且立即跳转到登录页面
+                var notExistDealStyle = document.getElementById('not-exist-deal-style').innerText;
+                if (notExistDealStyle == '2') {
+                    document.getElementById('logout-body-bg').style.display = 'none';
+                    var serverUrlPc = document.getElementById('loginBackUrl').innerText;
+                    var ssourl = document.getElementById('frontend-addr').innerText;
+                    if(!frontend_base_cas_url){
+                        var url = document.getElementById('frontend-addr').innerText;
+                        var script = document.createElement('script');
+                        script.type = 'text/javascript';
+                        script.src = url + '/public/convertBaseUrl.js?' + (new Date()).getTime();
+                        script.onload = function () {
+                            var frontend_base_cas_url = localStorage.getItem('frontend_base_cas_url') || '';
+                            var hrefUrlPc = window.location.origin + (frontend_base_cas_url || localStorage.getItem('frontend_base_cas_url')) + '/login?noRedirect=1'
+                            if (serverUrlPc && serverUrlPc != ''  && decodeURIComponent(serverUrlPc) != (window.location.origin + (frontend_base_cas_url || localStorage.getItem('frontend_base_cas_url')) + '/login')) {
+                            if (!decodeURIComponent(serverUrlPc).includes(ssourl) || decodeURIComponent(serverUrlPc).includes(ssourl + '/oauth2.0')) {
+                                hrefUrlPc = window.location.origin + (frontend_base_cas_url || localStorage.getItem('frontend_base_cas_url')) + '/login?noRedirect=1&service=' + serverUrlPc
+                            }
+                            }
+                            window.location.href = hrefUrlPc;
+                        };
+                        script.onerror = function (e) {
+                            console.log(e);
+                        };
+                        document.body.appendChild(script);
+                    }else{
+                        var hrefUrlPc = window.location.origin + (frontend_base_cas_url || localStorage.getItem('frontend_base_cas_url')) + '/login?noRedirect=1'
+                        if (serverUrlPc && serverUrlPc != ''  && decodeURIComponent(serverUrlPc) != (window.location.origin + (frontend_base_cas_url || localStorage.getItem('frontend_base_cas_url')) + '/login')) {
+                        if (!decodeURIComponent(serverUrlPc).includes(ssourl) || decodeURIComponent(serverUrlPc).includes(ssourl + '/oauth2.0')) {
+                            hrefUrlPc = window.location.origin + (frontend_base_cas_url || localStorage.getItem('frontend_base_cas_url')) + '/login?noRedirect=1&service=' + serverUrlPc
+                        }
+                        }
+                        window.location.href = hrefUrlPc;
+                    }
+
+
+
+
+                } else {
+                    document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-title')[
+                        canotAccessUrl ?
+                            1 : 0].innerHTML = '认证失败';
+
+                    //判断是第三方还是sid平台，显示相应提示信息
+
+                    var texttip = '';
+                    if (accessCode == 1510054) {
+                        texttip = document.getElementById('not-exist-tip').innerText;
+                    }
+                    if (accessCode == 1510052) {
+                        texttip = document.getElementById('sid-not-exist-tip').innerText;
+                    }
+                    document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-text')[
+                        canotAccessUrl ?
+                            1 : 0].innerHTML = texttip;
+
+
+                    //允许跳转到登录页面，使用其他认证方式登录
+                    if (document.getElementById('allow-to-login-page').innerText == 'true') {
+                        document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-button')[
+                            canotAccessUrl ? 1 : 0].style.display = 'block';
+
+                        document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') +
+                            '-button-text-box')[
+                            canotAccessUrl ? 1 : 0].style.display = 'none';
+
+                        document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') +
+                            '-button-text-other-login')[
+                            canotAccessUrl ? 1 : 0].style.display = 'block';
+
+
+                        document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-button')[
+                            canotAccessUrl ? 1 : 0].addEventListener('click', function () {
+
+                                var serverUrlPhone = document.getElementById('loginBackUrl').innerText;
+                                var ssourl = document.getElementById('frontend-addr').innerText;
+
+                                var hrefUrlPhone = window.location.origin + (frontend_base_cas_url || localStorage.getItem('frontend_base_cas_url')) + '/login?noRedirect=1'
+                                if (serverUrlPhone && serverUrlPhone != '') {
+                                    if (!decodeURIComponent(serverUrlPhone).includes(ssourl) || decodeURIComponent(serverUrlPhone).includes(ssourl + '/oauth2.0')) {
+                                        hrefUrlPhone = window.location.origin + (frontend_base_cas_url || localStorage.getItem('frontend_base_cas_url')) + '/login?noRedirect=1&service=' + serverUrlPhone
+                                    }
+                                }
+                                window.location.href = hrefUrlPhone;
+                            })
+                    }
+                }
+                break;
+            }
+            // 登录异常，重新登录
+            case 1510053: {
+
+                // pc and mobile
+                document.getElementsByClassName('service-error-content' + (isPhone ? '-phone' : '') + '-img')[
+                    canotAccessUrl ? 1 : 0].src = 'images/loginBackIn' + (isPhone ? 'Phone' : '') + '.png';
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-title')[
+                    canotAccessUrl ?
+                        1 : 0].innerHTML = '请重新登录';
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-text')[canotAccessUrl ?
+                    1 : 0].innerHTML = '您本次登录请求存在异常，系统';
+
+                var countDown = 10;
+                var countDownTimer = setInterval(function () {
+                    countDown -= 1;
+                    document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-help')[
+                        canotAccessUrl ? 1 : 0].innerHTML = '将在' + countDown + '秒后自动跳转到登录页面';
+
+                    document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') +
+                        '-countdown')[
+                        canotAccessUrl ? 1 : 0].innerHTML = '（' + countDown + '）';
+
+                    if (countDown <= 0) {
+                        clearInterval(countDownTimer);
+                        document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') +
+                            '-countdown')[canotAccessUrl ? 1 : 0].innerHTML = '';
+                        window.location.href = window.location.origin + frontend_base_cas_url + '/login';
+                    }
+                }, 1000)
+
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-help')[canotAccessUrl ?
+                    1 : 0].innerHTML = '将在' + countDown + '秒后自动跳转到登录页面';
+
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-countdown')[
+                    canotAccessUrl ? 1 : 0].innerHTML = '（' + countDown + '）';
+
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-button')[
+                    canotAccessUrl ? 1 : 0].style.display = 'block';
+
+                document.getElementsByClassName('service-error' + (isPhone ? '-phone' : '') + '-button')[
+                    canotAccessUrl ? 1 : 0].addEventListener('click', function () {
+                        clearInterval(countDownTimer);
+                        window.location.href = window.location.origin + frontend_base_cas_url + '/login';
+                    })
+                break;
+            }
+        }
+        if (isPhone) {
+            document.getElementById('web-content').style.display = 'none';
+            document.getElementById('user-web-content').style.display = 'none';
+            document.getElementById('content-header').style.display = 'none';
+            document.body.style.background = 'white';
+        } else {
+            document.getElementById('phone-content').style.display = 'none';
+            document.getElementById('user-phone-content').style.display = 'none';
+            document.getElementById('logout-body-bg').style.background = '#F3F3F3';
+        }
+    </script>
+
+</body>
+
+</html>
